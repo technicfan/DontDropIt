@@ -1,14 +1,13 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
-    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
+    id 'fabric-loom' version '1.15-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
-
-archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
 
 loom {
     accessWidenerPath = file("src/main/resources/dontdropit.accesswidener")
@@ -46,13 +45,6 @@ def depImpl(String id, boolean include = false) {
 
 }
 
-def depRuntimeOnly(String id) {
-    dependencies.modRuntimeOnly(id) {
-        exclude group: "net.fabricmc.fabric-api"
-        exclude module: "fabric-loader"
-    }
-}
-
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -65,44 +57,23 @@ dependencies {
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
     depImpl("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}", true)
-    include(modImplementation("de.siphalor:amecsapi-1.19:1+") {
-        exclude module: 'lazydfu'
-    })
+    // include(modImplementation("de.siphalor:amecsapi-1.19:1+") {
+    //    exclude module: 'lazydfu'
+    //})
     depImpl "com.terraformersmc:modmenu:${project.modmenu_version}"
-}
-
-if (Boolean.valueOf(project.use_runtime_deps)) {
-    repositories {
-        // for DataBreaker
-        maven {
-            name = "Gegy's Maven"
-            url = "https://maven.gegy.dev/"
-        }
-    }
-
-    dependencies {
-        // DataBreaker applies a number of patches to eliminate the loading of data fixers
-        // This greatly reduces the amount of time needed to start the game, but is generally unsafe in production
-        modRuntimeOnly "supercoder79:databreaker:${project.databreaker_version}"
-        // JellySquid's elemental optimizations (and Starlight)
-        modRuntimeOnly "maven.modrinth:lithium:${project.lithium_version}"
-        modRuntimeOnly "maven.modrinth:phosphor:${project.phosphor_version}"
-        modRuntimeOnly "maven.modrinth:sodium:${project.sodium_version}"
-        runtimeOnly 'org.joml:joml:1.10.4' // needed for Sodium
-    }
 }
 
 processResources {
     inputs.property "version", project.version
 
     filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        expand "version": inputs.properties.version
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-    it.options.release = 17
+    it.options.release = 21
 }
 
 java {
@@ -110,10 +81,15 @@ java {
     // if it is present.
     // If you remove this line, sources will not be generated.
     withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}"}
-    }
+	inputs.property "archivesName", project.base.archivesName
+
+	from("LICENSE") {
+		rename { "${it}_${inputs.properties.archivesName}"}
+	}
 }

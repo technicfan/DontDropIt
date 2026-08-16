@@ -13,10 +13,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -57,32 +58,32 @@ public abstract class HandledScreenMixin_HooksAndMisc extends Screen implements 
     }
 
     @Redirect(method = "keyPressed",
-              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;matchesKey(II)Z",
+              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;matchesKey(Lnet/minecraft/client/input/KeyInput;)Z",
                        ordinal = 2))
-    public boolean disableDropKey(KeyBinding keyBinding, int keyCode, int scanCode) {
+    public boolean disableDropKey(KeyBinding keyBinding, KeyInput input) {
         if (focusedSlot == null || IgnoredSlots.isSlotIgnored(focusedSlot))
-            return keyBinding.matchesKey(keyCode, scanCode);
+            return keyBinding.matchesKey(input);
         ItemStack stack = dontdropit_getSelectedStack();
         if (ModConfig.get().dropDelay.mode.isEnabled(stack))
             return false;
         return dontdropit_canDrop()
                 && FavoredChecker.canDropStack(dontdropit_getSelectedStack())
-                && keyBinding.matchesKey(keyCode, scanCode);
+                && keyBinding.matchesKey(input);
     }
 
     @Redirect(method = "keyPressed",
-              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screen/ingame/HandledScreen;hasControlDown()Z"))
-    public boolean useDropStackKey() {
+              at = @At(value = "INVOKE", target = "Lnet/minecraft/client/input/KeyInput;hasCtrl()Z"))
+    public boolean useDropStackKey(KeyInput input) {
         return ModKeyBindings.isDown(keyDropStack);
     }
 
     @Inject(method = "drawSlot",
             at = @At(value = "INVOKE",
-                     target = "Lnet/minecraft/client/render/item/ItemRenderer;renderGuiItemOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V",
+                     target = "Lnet/minecraft/client/gui/DrawContext;drawStackOverlay(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V",
                      shift = At.Shift.AFTER))
-    public void drawSlotProgressOverlay(MatrixStack matrixStack, Slot slot, CallbackInfo ci) {
+    public void drawSlotProgressOverlay(DrawContext context, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (IgnoredSlots.isSlotIgnored(slot))
             return;
-        DropDelayRenderer.renderOverlay(matrixStack, slot.getStack(), slot.x, slot.y, getZOffset());
+        DropDelayRenderer.renderOverlay(context, slot.getStack(), slot.x, slot.y);
     }
 }

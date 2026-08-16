@@ -16,9 +16,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
@@ -34,9 +34,10 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends ScreenHandler>
     @Shadow @Final protected T handler;
     @Shadow protected int x;
     @Shadow protected int y;
+    @Shadow private int backgroundWidth, backgroundHeight;
 
     @Shadow protected abstract void onMouseClick(Slot slot, int invSlot, int clickData, SlotActionType actionType);
-    @Shadow protected abstract boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button);
+    @Shadow protected abstract boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top);
 
     private HandledScreenMixin_InterceptMouse() {
         super(Text.empty());
@@ -120,15 +121,16 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends ScreenHandler>
         case ALL_ITEMS:
             canDrop = false;
             break;
+        default:
         }
         if (forceDrop || canDrop)
             onMouseClick(null, -999, clickData, SlotActionType.PICKUP);
     }
 
-    @Inject(method = "drawMouseoverTooltip", at = @At("TAIL"))
-    public void drawDropBlockTooltip(MatrixStack matrixStack, int mouseX, int mouseY, CallbackInfo ci) {
+    @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"))
+    public void drawDropBlockTooltip(DrawContext context, int mouseX, int mouseY, CallbackInfo ci) {
         ItemStack cursorStack = handler.getCursorStack();
-        if (cursorStack.isEmpty() || !isClickOutsideBounds(mouseX, mouseY, x, y, 0))
+        if (cursorStack.isEmpty() || !isClickOutsideBounds(mouseX, mouseY, x, y))
             return;
         ArrayList<Text> tooltipTexts = new ArrayList<>();
         boolean forceDrop = ModKeyBindings.isDown(keyForceDrop);
@@ -140,6 +142,7 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends ScreenHandler>
         case DISABLED:
             canDrop = true;
             break;
+        default:
         }
         if (forceDrop || canDrop) {
             tooltipTexts.add(Text.translatable("dontdropit.tooltip.drop.allowed")
@@ -153,7 +156,7 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends ScreenHandler>
                     .styled(style -> style.withBold(true).withColor(Formatting.RED)));
             if (keyForceDrop.isUnbound()) {
                 tooltipTexts.add(Text.translatable("dontdropit.tooltip.drop.unblock_hint.unbound[0]",
-                        Texts.bracketed(Text.translatable(keyForceDrop.getTranslationKey())
+                        Texts.bracketed(Text.translatable(keyForceDrop.getId())
                                 .styled(style -> style.withBold(true).withColor(Formatting.WHITE))))
                         .styled(style -> style.withColor(Formatting.GRAY)));
                 tooltipTexts.add(Text.translatable("dontdropit.tooltip.drop.unblock_hint.unbound[1]")
@@ -164,6 +167,6 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends ScreenHandler>
                                 .styled(style -> style.withBold(true).withColor(Formatting.WHITE))))
                         .styled(style -> style.withColor(Formatting.GRAY)));
         }
-        renderTooltip(matrixStack, tooltipTexts, mouseX, mouseY);
+        context.drawTooltip(textRenderer, tooltipTexts, mouseX, mouseY);
     }
 }

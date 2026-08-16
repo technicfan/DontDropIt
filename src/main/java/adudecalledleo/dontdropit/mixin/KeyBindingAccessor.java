@@ -7,6 +7,6 @@ import net.minecraft.client.option.KeyBinding;
 
 @Mixin(KeyBinding.class)
 public interface KeyBindingAccessor {
-    @Accessor int getTimesPressed();
-    @Accessor void setTimesPressed(int timesPressed);
+    @Accessor("timesPressed") int getTimesPressed();
+    @Accessor("timesPressed") void setTimesPressed(int timesPressed);
 }

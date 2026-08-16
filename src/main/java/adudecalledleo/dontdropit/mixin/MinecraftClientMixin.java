@@ -11,7 +11,7 @@ import net.minecraft.client.option.KeyBinding;
 public abstract class MinecraftClientMixin {
     @Redirect(method = "handleInputEvents",
               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/option/KeyBinding;wasPressed()Z",
-                       ordinal = 7))
+                       ordinal = 8))
     public boolean disableDropKey(KeyBinding binding) {
         return false;
     }

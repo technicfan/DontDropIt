@@ -56,6 +56,7 @@ public abstract class HandledScreenMixin_InterceptClose<T extends ScreenHandler>
         case ALL_ITEMS:
             canDrop = false;
             break;
+        default:
         }
         if (cursorStack.isEmpty() || canDrop)
             return;

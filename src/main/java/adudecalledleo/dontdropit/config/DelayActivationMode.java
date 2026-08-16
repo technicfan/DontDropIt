@@ -3,7 +3,7 @@ package adudecalledleo.dontdropit.config;
 import java.util.Collections;
 import java.util.Locale;
 
-import me.shedaniel.autoconfig.AutoConfig;
+import me.shedaniel.autoconfig.AutoConfigClient;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 
@@ -25,21 +25,25 @@ public enum DelayActivationMode {
         };
     }
 
-    public Text toText() {
-        var text =
-                Text.translatable("text.autoconfig.dontdropit.general.delayed_drop."
-                        + this.name().toLowerCase(Locale.ROOT));
-        if (this == DISABLED) {
-            text = text.styled(style -> style.withColor(Formatting.RED));
+    public static Text toText(Object obj) {
+        if (obj instanceof DelayActivationMode thiz) {
+            var text =
+                    Text.translatable("text.autoconfig.dontdropit.general.delayed_drop."
+                            + thiz.name().toLowerCase(Locale.ROOT));
+            if (thiz == DISABLED) {
+                text = text.styled(style -> style.withColor(Formatting.RED));
+            }
+            return text;
+        } else {
+            return Text.empty();
         }
-        return text;
     }
 
     private static final DelayActivationMode[] VALUES = values();
 
     public static <T extends ConfigData> void registerConfigGuiProvider(Class<T> configClass) {
         final ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-        AutoConfig.getGuiRegistry(configClass).registerTypeProvider((i13n, field, config, defaults, registry) ->
+        AutoConfigClient.getGuiRegistry(configClass).registerTypeProvider((i13n, field, config, defaults, registry) ->
                 Collections.singletonList(
                         entryBuilder.startSelector(
                                 Text.translatable(i13n),

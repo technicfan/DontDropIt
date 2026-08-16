@@ -14,6 +14,7 @@ import net.minecraft.client.Keyboard;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.input.KeyInput;
 import net.minecraft.client.option.KeyBinding;
 
 @Mixin(Keyboard.class)
@@ -21,7 +22,7 @@ public abstract class KeyboardMixin {
     @Shadow @Final private MinecraftClient client;
 
     @Inject(method = "onKey", at = @At(value = "HEAD"))
-    public void updateModKeys(long window, int key, int scancode, int action, int mods, CallbackInfo ci) {
+    public void updateModKeys(long window, int action, KeyInput input, CallbackInfo ci) {
         // this forces our key bindings (and the drop key binding) to be updated in handled screens
         // this allows scancodes to work properly, since you can't poll them via GLFW
         if (client.getWindow().getHandle() == window && client.currentScreen instanceof HandledScreen<?> screen) {
@@ -33,11 +34,11 @@ public abstract class KeyboardMixin {
             }
 
             KeyBinding targetBinding = null;
-            if (client.options.dropKey.matchesKey(key, scancode))
+            if (client.options.dropKey.matchesKey(input))
                 targetBinding = client.options.dropKey;
             else {
                 for (KeyBinding keyBinding : ModKeyBindings.all) {
-                    if (keyBinding.matchesKey(key, scancode)) {
+                    if (keyBinding.matchesKey(input)) {
                         targetBinding = keyBinding;
                         break;
                     }

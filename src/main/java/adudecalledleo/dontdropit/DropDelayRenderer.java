@@ -2,9 +2,9 @@ package adudecalledleo.dontdropit;
 
 import adudecalledleo.dontdropit.config.FavoredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.DrawableHelper;
-import net.minecraft.client.util.math.MatrixStack;
+
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -12,11 +12,10 @@ import net.minecraft.util.math.MathHelper;
 public class DropDelayRenderer {
     private static final Identifier TEX_FAVORITE = DontDropIt.id("textures/gui/favorite.png");
 
-    public static void renderFavoriteIcon(MatrixStack matrices, ItemStack stack, int x, int y) {
+    public static void renderFavoriteIcon(DrawContext context, ItemStack stack, int x, int y) {
         if (!ModConfig.get().favorites.drawOverlay || !FavoredChecker.isStackFavored(stack))
             return;
-        RenderSystem.setShaderTexture(0, TEX_FAVORITE);
-        DrawableHelper.drawTexture(matrices, x, y, 18, 18, 18, 18, 18, 18);
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, TEX_FAVORITE, x, y, 18, 18, 18, 18, 18, 18);
     }
 
     private static int pack(int r, int g, int b, int a) {
@@ -26,7 +25,7 @@ public class DropDelayRenderer {
     private static final int COLOR_FORCE = pack(0xFF, 0x00, 0x00, 0x30);
     private static final int COLOR_PROGRESS = pack(0x00, 0xFF, 0x00, 0x30);
 
-    public static void renderProgressOverlay(MatrixStack matrices, ItemStack stack, int x, int y, int w, int h) {
+    public static void renderProgressOverlay(DrawContext context, ItemStack stack, int x, int y, int w, int h) {
         ItemStack currentStack = DropDelayHandler.getCurrentStack();
         if (currentStack.isEmpty() || currentStack != stack)
             return;
@@ -34,24 +33,18 @@ public class DropDelayRenderer {
             return;
         if ((stack.getCount() > 1 && DropDelayHandler.isDroppingEntireStack())
                 || ModKeyBindings.isDown(ModKeyBindings.keyForceDrop))
-            DrawableHelper.fill(matrices, x, y, x + w, y + h, COLOR_FORCE);
+            context.fill(x, y, x + w, y + h, COLOR_FORCE);
         long counter = DropDelayHandler.getCounter();
         int progHeight = MathHelper.floor((counter / (double) DropDelayHandler.getCounterMax()) * h);
-        DrawableHelper.fill(matrices, x, y + h - progHeight, x + w, y + h, COLOR_PROGRESS);
+        context.fill(x, y + h - progHeight, x + w, y + h, COLOR_PROGRESS);
     }
 
-    public static void renderOverlay(MatrixStack matrixStack, ItemStack stack, int x, int y, int z) {
+    public static void renderOverlay(DrawContext context, ItemStack stack, int x, int y) {
         if (stack.isEmpty())
             return;
-        RenderSystem.enableBlend();
-        matrixStack.push();
-        matrixStack.translate(0, 0, z + 200);
-        renderFavoriteIcon(matrixStack, stack, x - 1, y - 1);
-        matrixStack.translate(0, 0, 5);
-        RenderSystem.colorMask(true, true, true, false);
-        renderProgressOverlay(matrixStack, stack, x, y, 16, 16);
-        RenderSystem.colorMask(true, true, true, true);
-        matrixStack.pop();
-        RenderSystem.disableBlend();
+        context.getMatrices().pushMatrix();
+        renderFavoriteIcon(context, stack, x - 1, y - 1);
+        renderProgressOverlay(context, stack, x, y, 16, 16);
+        context.getMatrices().popMatrix();
     }
 }

@@ -3,18 +3,20 @@ package adudecalledleo.dontdropit;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 
 import net.minecraft.client.option.KeyBinding;
-
-import static org.lwjgl.glfw.GLFW.*;
+import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Identifier;
 
 public class ModKeyBindings {
     private ModKeyBindings() { }
 
+    private static final KeyBinding.Category MOD_CATEGORY = KeyBinding.Category.create(Identifier.of(DontDropIt.MOD_ID, DontDropIt.MOD_ID));
+
     public static final KeyBinding keyDropStack = new KeyBinding("key.dontdropit.dropStack",
-            GLFW_KEY_LEFT_CONTROL, "key.categories.dontdropit");
+            InputUtil.GLFW_KEY_LEFT_CONTROL, MOD_CATEGORY);
     public static final KeyBinding keyForceDrop = new KeyBinding("key.dontdropit.forceDrop",
-            GLFW_KEY_LEFT_ALT, "key.categories.dontdropit");
+            InputUtil.GLFW_KEY_LEFT_ALT, MOD_CATEGORY);
     public static final KeyBinding keyToggleDropDelay = new KeyBinding("key.dontdropit.toggleDropDelay",
-            GLFW_KEY_UNKNOWN, "key.categories.dontdropit");
+            InputUtil.UNKNOWN_KEY.getCode(), MOD_CATEGORY);
 
     public static final KeyBinding[] all = new KeyBinding[] { keyDropStack, keyForceDrop, keyToggleDropDelay };
 

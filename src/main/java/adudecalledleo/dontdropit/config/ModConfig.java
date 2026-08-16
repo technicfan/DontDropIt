@@ -1,5 +1,6 @@
 package adudecalledleo.dontdropit.config;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -11,14 +12,17 @@ import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
-
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 
 import static adudecalledleo.dontdropit.config.ModConfigLogger.LOGGER;
 
@@ -100,23 +104,32 @@ public class ModConfig implements ConfigData {
 
         private static List<String> getRareItemIds() {
             ArrayList<String> itemIds = new ArrayList<>();
-            for (Identifier id : Registry.ITEM.getIds()) {
-                Item item = Registry.ITEM.get(id);
-                if (item.getRarity(new ItemStack(item)) != Rarity.COMMON)
+            for (Identifier id : Registries.ITEM.getIds()) {
+                Item item = Registries.ITEM.get(id);
+                if (item.getDefaultStack().getRarity() != Rarity.COMMON)
                     itemIds.add(id.toString());
             }
             return itemIds;
         }
 
+        @SuppressWarnings("unchecked")
         private static List<String> getEnchantmentIds() {
-            ArrayList<String> enchIds = new ArrayList<>();
-            for (Identifier id : Registry.ENCHANTMENT.getIds()) {
-                Enchantment enchantment = Registry.ENCHANTMENT.get(id);
-                if (enchantment == null || enchantment.isCursed())
-                    continue;
-                enchIds.add(id.toString());
+            if (MinecraftClient.getInstance().world != null) {
+                try {
+                    Registry<Enchantment> enchantmentRegistry = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
+                    return enchantmentRegistry.getIds().stream().map(id -> id.toString()).toList();
+                } catch (IllegalStateException e) {}
             }
-            return enchIds;
+            return List.of(Enchantments.class.getDeclaredFields()).stream()
+                .filter(field -> Modifier.isStatic(field.getModifiers())).filter(field -> field.getType().equals(RegistryKey.class)).map(field -> {
+                    RegistryKey<Enchantment> key;
+                    try {
+                        key = (RegistryKey<Enchantment>)field.get(new Object());
+                    } catch (IllegalAccessException e) {
+                        key = null;
+                    }
+                    return key;
+                }).filter(key -> key != null).map(key -> key.getValue().toString()).toList();
         }
 
         void postUpdate() {
@@ -145,10 +158,15 @@ public class ModConfig implements ConfigData {
             }
             restoreDefaults = Boolean.FALSE;
             if (removeInvalidIds) {
-                removeInvalidIdsFrom(items, "items", Registry.ITEM);
-                removeInvalidTagIdsFrom(itemTags, "item", Registry.ITEM);
-                removeInvalidIdsFrom(enchantments, "enchantments", Registry.ENCHANTMENT);
-                removeInvalidTagIdsFrom(enchantmentTags, "enchantment", Registry.ENCHANTMENT);
+                removeInvalidIdsFrom(items, "items", Registries.ITEM);
+                removeInvalidTagIdsFrom(itemTags, "item", Registries.ITEM);
+                if (MinecraftClient.getInstance().world != null) {
+                    try {
+                        Registry<Enchantment> enchantmentRegistry = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
+                        removeInvalidIdsFrom(enchantments, "enchantments", enchantmentRegistry);
+                        removeInvalidTagIdsFrom(enchantmentTags, "enchantment", enchantmentRegistry);
+                    } catch (IllegalStateException e) {}
+                }
             }
         }
 
@@ -186,8 +204,8 @@ public class ModConfig implements ConfigData {
                     it.remove();
                     continue;
                 }
-                var tagKey = TagKey.of(registry.getKey(), id);
-                if (!registry.containsTag(tagKey)) {
+                // var tagKey = TagKey.of(registry.getKey(), id);
+                if (!registry.containsId(id)) {
                     LOGGER.warn("Favorites: Found unregistered identifier \"{}\" in favored {} tags list, removing", id, description);
                     it.remove();
                 }

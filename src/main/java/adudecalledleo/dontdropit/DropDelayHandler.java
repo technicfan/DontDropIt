@@ -40,7 +40,7 @@ public class DropDelayHandler {
                 wasToggleDelayDown = true;
                 var dropDelay = ModConfig.get().dropDelay;
                 dropDelay.disabled = !dropDelay.disabled;
-                DontDropItToast.showDropDelayDisabledToggled(client.getToastManager(), dropDelay.disabled);
+                DontDropItToast.show(client.getToastManager(), dropDelay.disabled);
             }
         } else
             wasToggleDelayDown = false;
@@ -56,7 +56,7 @@ public class DropDelayHandler {
     private static void tickNormally(MinecraftClient client) {
         if (client.player == null)
             return;
-        ItemStack stack = client.player.getInventory().getMainHandStack();
+        ItemStack stack = client.player.getInventory().getSelectedStack();
         if (ModConfig.get().dropDelay.isEnabled(stack)) {
             if (client.player.isSpectator()) {
                 reset();
