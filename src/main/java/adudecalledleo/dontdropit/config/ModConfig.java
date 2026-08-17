@@ -1,6 +1,5 @@
 package adudecalledleo.dontdropit.config;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -18,13 +17,10 @@ import net.minecraft.core.HolderSet.Named;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.EnchantmentTags;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 
 import static adudecalledleo.dontdropit.config.ModConfigLogger.LOGGER;
 
@@ -105,36 +101,20 @@ public class ModConfig implements ConfigData {
         private List<String> tags;
 
         private static List<String> getRareItemIds() {
-            ArrayList<String> itemIds = new ArrayList<>();
             //? if >1.21.11
-            /*if (Minecraft.getInstance().level != null)*/
-            for (Identifier id : BuiltInRegistries.ITEM.keySet()) {
-                Item item = BuiltInRegistries.ITEM.getValue(id);
-                if (item.getDefaultInstance().getRarity() != Rarity.COMMON)
-                    itemIds.add(id.toString());
-            }
-            return itemIds;
+            /*if (Minecraft.getInstance().level == null) return List.of();*/
+            return BuiltInRegistries.ITEM.stream().filter(item -> item.getDefaultInstance().getRarity() != Rarity.COMMON).map(item -> BuiltInRegistries.ITEM.getKey(item).toString()).toList();
         }
 
-        @SuppressWarnings("unchecked")
         private static List<String> getEnchantmentIds() {
             if (Minecraft.getInstance().level != null) {
                 try {
                     Registry<Enchantment> enchantmentRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
                     Named<Enchantment> curses = enchantmentRegistry.getOrThrow(EnchantmentTags.CURSE);
-                    return enchantmentRegistry.keySet().stream().filter(id -> !curses.stream().anyMatch(entry -> entry.value().equals(enchantmentRegistry.getValue(id)))).map(id -> id.toString()).toList();
+                    return enchantmentRegistry.stream().filter(ench -> !curses.stream().anyMatch(entry -> entry.value().equals(ench))).map(ench -> enchantmentRegistry.getKey(ench).toString()).toList();
                 } catch (IllegalStateException e) {}
             }
-            return List.of(Enchantments.class.getDeclaredFields()).stream()
-                .filter(field -> Modifier.isStatic(field.getModifiers())).filter(field -> field.getType().equals(ResourceKey.class)).map(field -> {
-                    ResourceKey<Enchantment> key;
-                    try {
-                        key = (ResourceKey<Enchantment>)field.get(new Object());
-                    } catch (IllegalAccessException e) {
-                        key = null;
-                    }
-                    return key;
-                }).filter(key -> key != null).map(key -> key.identifier().toString()).toList();
+            return List.of();
         }
 
         void postUpdate() {
