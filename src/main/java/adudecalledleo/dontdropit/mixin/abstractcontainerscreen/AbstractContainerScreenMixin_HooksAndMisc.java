@@ -28,7 +28,7 @@ import static adudecalledleo.dontdropit.ModKeyMappings.keyDropStack;
 public abstract class AbstractContainerScreenMixin_HooksAndMisc extends Screen implements HandledScreenHooks {
     @Shadow protected Slot hoveredSlot;
 
-    @Shadow protected abstract void slotClicked(Slot slot, int invSlot, int clickData, ClickType actionType);
+    @Shadow protected abstract void slotClicked(Slot slot, int invSlot, int button, ClickType actionType);
 
     private AbstractContainerScreenMixin_HooksAndMisc() {
         super(Component.empty());

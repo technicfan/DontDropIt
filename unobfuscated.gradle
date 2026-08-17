@@ -47,6 +47,10 @@ stonecutter {
         replace "gui.Gui", "gui.Hud"
         replace "Gui.class", "Hud.class"
     }
+    replacements.string(current.parsed.matches('>26.2')) {
+        replace "slotClicked(Lnet/minecraft/world/inventory/Slot;II", "slotClicked(Lnet/minecraft/world/inventory/Slot;ILnet/minecraft/client/input/MouseButtonEvent;"
+        replace "int clickData", "net.minecraft.client.input.MouseButtonEvent clickData"
+    }
 }
 
 processResources {

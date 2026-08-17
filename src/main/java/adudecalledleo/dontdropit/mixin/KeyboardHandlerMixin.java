@@ -1,7 +1,5 @@
 package adudecalledleo.dontdropit.mixin;
 
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
-
 import adudecalledleo.dontdropit.ModKeyMappings;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.KeyboardHandler;
@@ -15,6 +13,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 @Mixin(KeyboardHandler.class)
 public abstract class KeyboardHandlerMixin {
@@ -45,7 +45,7 @@ public abstract class KeyboardHandlerMixin {
             }
             if (targetBinding == null)
                 return;
-            if (action == GLFW_RELEASE)
+            if (action == InputConstants.RELEASE)
                 targetBinding.setDown(false);
             else {
                 targetBinding.setDown(true);

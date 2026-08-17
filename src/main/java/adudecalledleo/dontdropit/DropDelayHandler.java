@@ -62,16 +62,23 @@ public class DropDelayHandler {
                 return;
             }
             doDropProgress(minecraft, stack, entireStack -> {
+                //? if <=26.2 {
                 if (minecraft.player.drop(entireStack))
                     minecraft.player.swing(InteractionHand.MAIN_HAND);
+                //?} else
+                /*minecraft.player.drop(entireStack);*/
             });
         } else {
             reset();
             while (minecraft.options.keyDrop.consumeClick()) {
                 if (FavoredChecker.isStackFavored(stack))
                     continue;
-                if (!minecraft.player.isSpectator() && minecraft.player.drop(ModKeyMappings.isDown(keyDropStack)))
-                    minecraft.player.swing(InteractionHand.MAIN_HAND);
+                if (!minecraft.player.isSpectator()
+                //? if <=26.2 {
+                    && minecraft.player.drop(ModKeyMappings.isDown(keyDropStack)))
+                        minecraft.player.swing(InteractionHand.MAIN_HAND);
+                //?} else
+                /*) minecraft.player.drop(ModKeyMappings.isDown(keyDropStack));*/
             }
         }
     }

@@ -21,9 +21,11 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.llamalad7.mixinextras.sugar.Local;
 
 import static adudecalledleo.dontdropit.ModKeyMappings.keyForceDrop;
 
@@ -66,19 +68,18 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
     @Unique
     private boolean dontdropit$cancelOnMouseClick;
 
-    @ModifyArg(method = "mouseClicked", index = 0,
+    @Inject(method = "mouseClicked",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V",
-                    ordinal = 1))
-    public Slot disableFavoredShiftClick_mouseClicked(Slot slot, int invSlot, int clickData, ClickType actionType) {
+                    ordinal = 1, shift = At.Shift.BEFORE))
+    public void disableFavoredShiftClick_mouseClicked(CallbackInfoReturnable<Boolean> ci, @Local Slot slot, @Local(ordinal = 2) int invSlot, @Local ClickType actionType) {
         dontdropit$cancelOnMouseClick = !shouldAllowShiftClick(slot, invSlot, actionType);
-        return slot;
     }
 
     @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V",
             at = @At("HEAD"),
             cancellable = true)
-    public void cancelOnMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo ci) {
+    public void cancelOnMouseClick(Slot slot, int slotId, int clickData, ClickType actionType, CallbackInfo ci) {
         if (dontdropit$cancelOnMouseClick) {
             dontdropit$cancelOnMouseClick = false;
             ci.cancel();
