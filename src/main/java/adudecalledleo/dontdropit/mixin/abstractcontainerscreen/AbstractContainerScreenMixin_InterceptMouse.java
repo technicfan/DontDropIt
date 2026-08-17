@@ -97,7 +97,7 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
     @Redirect(method = "mouseReleased",
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V",
-                       ordinal = 9))
+                       ordinal = /*? if 1.21.11 {*/9/*?} else if 26.1 {*//*6*//*?} else {*//*3*//*?}*/))
     public void oobClickDropOverride(@SuppressWarnings("rawtypes") AbstractContainerScreen handledScreen,
             Slot slot, int invSlot, int clickData, ClickType actionType) {
         if (actionType == ClickType.QUICK_MOVE) {

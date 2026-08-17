@@ -28,8 +28,8 @@ public class DropDelayHandler {
         reset();
     }
 
-    public static void tick(Minecraft client) {
-        if (client.player == null) {
+    public static void tick(Minecraft minecraft) {
+        if (minecraft.player == null) {
             reset();
             wasToggleDelayDown = false;
             return;
@@ -39,53 +39,53 @@ public class DropDelayHandler {
                 wasToggleDelayDown = true;
                 var dropDelay = ModConfig.get().dropDelay;
                 dropDelay.disabled = !dropDelay.disabled;
-                DontDropItToast.show(client.getToastManager(), dropDelay.disabled);
+                DontDropItToast.show(minecraft.getToastManager(), dropDelay.disabled);
             }
         } else
             wasToggleDelayDown = false;
-        if (client.screen != null) {
-            if (client.screen instanceof HandledScreenHooks)
-                tickOnHandledScreen(client, (HandledScreenHooks) client.screen);
+        if (minecraft.screen != null) {
+            if (minecraft.screen instanceof HandledScreenHooks)
+                tickOnHandledScreen(minecraft, (HandledScreenHooks) minecraft.screen);
             else
                 reset();
         } else
-            tickNormally(client);
+            tickNormally(minecraft);
     }
 
-    private static void tickNormally(Minecraft client) {
-        if (client.player == null)
+    private static void tickNormally(Minecraft minecraft) {
+        if (minecraft.player == null)
             return;
-        ItemStack stack = client.player.getInventory().getSelectedItem();
+        ItemStack stack = minecraft.player.getInventory().getSelectedItem();
         if (ModConfig.get().dropDelay.isEnabled(stack)) {
-            if (client.player.isSpectator()) {
+            if (minecraft.player.isSpectator()) {
                 reset();
                 return;
             }
-            doDropProgress(client, stack, entireStack -> {
-                if (client.player.drop(entireStack))
-                    client.player.swing(InteractionHand.MAIN_HAND);
+            doDropProgress(minecraft, stack, entireStack -> {
+                if (minecraft.player.drop(entireStack))
+                    minecraft.player.swing(InteractionHand.MAIN_HAND);
             });
         } else {
             reset();
-            while (client.options.keyDrop.consumeClick()) {
+            while (minecraft.options.keyDrop.consumeClick()) {
                 if (FavoredChecker.isStackFavored(stack))
                     continue;
-                if (!client.player.isSpectator() && client.player.drop(ModKeyMappings.isDown(keyDropStack)))
-                    client.player.swing(InteractionHand.MAIN_HAND);
+                if (!minecraft.player.isSpectator() && minecraft.player.drop(ModKeyMappings.isDown(keyDropStack)))
+                    minecraft.player.swing(InteractionHand.MAIN_HAND);
             }
         }
     }
 
-    private static void tickOnHandledScreen(Minecraft client, HandledScreenHooks screenHooks) {
-        if (client.player == null)
+    private static void tickOnHandledScreen(Minecraft minecraft, HandledScreenHooks screenHooks) {
+        if (minecraft.player == null)
             return;
         ItemStack stack = screenHooks.dontdropit_getSelectedStack();
         if (ModConfig.get().dropDelay.mode.isEnabled(stack)) {
-            if (client.player.isSpectator() || !screenHooks.dontdropit_canDrop()) {
+            if (minecraft.player.isSpectator() || !screenHooks.dontdropit_canDrop()) {
                 reset();
                 return;
             }
-            doDropProgress(client, stack, screenHooks::dontdropit_drop);
+            doDropProgress(minecraft, stack, screenHooks::dontdropit_drop);
         }
         else
             reset();
@@ -96,9 +96,9 @@ public class DropDelayHandler {
         void drop(boolean entireStack);
     }
 
-    private static void doDropProgress(Minecraft client, ItemStack stack, DropAction dropAction) {
-        if (ModKeyMappings.isDown(client.options.keyDrop)) {
-            ((KeyMappingAccessor) client.options.keyDrop).setTimesPressed(0); // eat all presses!
+    private static void doDropProgress(Minecraft minecraft, ItemStack stack, DropAction dropAction) {
+        if (ModKeyMappings.isDown(minecraft.options.keyDrop)) {
+            ((KeyMappingAccessor) minecraft.options.keyDrop).setTimesPressed(0); // eat all presses!
             if (dropDelayCounter < getCounterMax()) {
                 boolean isDropStackDown = ModKeyMappings.isDown(keyDropStack) && stack.getCount() > 1;
                 if (dropDelayCounter == 0)

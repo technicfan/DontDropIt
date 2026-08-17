@@ -104,6 +104,8 @@ public class ModConfig implements ConfigData {
 
         private static List<String> getRareItemIds() {
             ArrayList<String> itemIds = new ArrayList<>();
+            //? if >1.21.11
+            /*if (Minecraft.getInstance().level != null)*/
             for (Identifier id : BuiltInRegistries.ITEM.keySet()) {
                 Item item = BuiltInRegistries.ITEM.getValue(id);
                 if (item.getDefaultInstance().getRarity() != Rarity.COMMON)

@@ -42,8 +42,8 @@ public class DontDropIt implements ClientModInitializer, DontDropItApi {
         ModKeyMappings.register();
         IgnoredSlots.collectFromEntrypoints();
         ClientTickEvents.END_CLIENT_TICK.register(DropDelayHandler::tick);
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, world) -> {
-            if (world != null) {
+        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((minecraft, level) -> {
+            if (level != null) {
                 FavoredChecker.updateFavoredSets(ModConfig.get());
             }
         });

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public abstract class MinecraftMixin {
     @Redirect(method = "handleKeybinds",
               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z",
-                       ordinal = 8))
+                       ordinal = /*? if 1.21.11 {*/8/*?} else if 26.1 {*//*10*//*?} else {*//*7*//*?}*/))
     public boolean disableDropKey(KeyMapping keyMapping) {
         return false;
     }

@@ -9,8 +9,10 @@ base {
     archivesName = project.archives_base_name
 }
 
+def accesswidener = "1.21.11.accesswidener"
+
 loom {
-    accessWidenerPath = file("src/main/resources/dontdropit.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/accesswideners/${accesswidener}")
 }
 
 repositories {
@@ -19,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    minecraft "com.mojang:minecraft:${sc.current.version}"
     mappings loom.officialMojangMappings() 
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
@@ -30,9 +32,11 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
+    inputs.property "aw", accesswidener
+    inputs.property "minecraft", project.supported_versions
 
     filesMatching("fabric.mod.json") {
-        expand "version": inputs.properties.version
+        expand inputs.properties
     }
 }
 
