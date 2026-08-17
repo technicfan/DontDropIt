@@ -1,13 +1,13 @@
 package adudecalledleo.dontdropit;
 
-import static adudecalledleo.dontdropit.ModKeyBindings.keyDropStack;
-import static adudecalledleo.dontdropit.ModKeyBindings.keyToggleDropDelay;
+import static adudecalledleo.dontdropit.ModKeyMappings.keyDropStack;
+import static adudecalledleo.dontdropit.ModKeyMappings.keyToggleDropDelay;
 
 import adudecalledleo.dontdropit.config.DelayActivationMode;
 import adudecalledleo.dontdropit.config.FavoredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import adudecalledleo.dontdropit.duck.HandledScreenHooks;
-import adudecalledleo.dontdropit.mixin.KeyBindingAccessor;
+import adudecalledleo.dontdropit.mixin.KeyMappingAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +34,7 @@ public class DropDelayHandler {
             wasToggleDelayDown = false;
             return;
         }
-        if (ModKeyBindings.isDown(keyToggleDropDelay)) {
+        if (ModKeyMappings.isDown(keyToggleDropDelay)) {
             if (!wasToggleDelayDown) {
                 wasToggleDelayDown = true;
                 var dropDelay = ModConfig.get().dropDelay;
@@ -70,7 +70,7 @@ public class DropDelayHandler {
             while (client.options.keyDrop.consumeClick()) {
                 if (FavoredChecker.isStackFavored(stack))
                     continue;
-                if (!client.player.isSpectator() && client.player.drop(ModKeyBindings.isDown(keyDropStack)))
+                if (!client.player.isSpectator() && client.player.drop(ModKeyMappings.isDown(keyDropStack)))
                     client.player.swing(InteractionHand.MAIN_HAND);
             }
         }
@@ -97,10 +97,10 @@ public class DropDelayHandler {
     }
 
     private static void doDropProgress(Minecraft client, ItemStack stack, DropAction dropAction) {
-        if (ModKeyBindings.isDown(client.options.keyDrop)) {
-            ((KeyBindingAccessor) client.options.keyDrop).setTimesPressed(0); // eat all presses!
+        if (ModKeyMappings.isDown(client.options.keyDrop)) {
+            ((KeyMappingAccessor) client.options.keyDrop).setTimesPressed(0); // eat all presses!
             if (dropDelayCounter < getCounterMax()) {
-                boolean isDropStackDown = ModKeyBindings.isDown(keyDropStack) && stack.getCount() > 1;
+                boolean isDropStackDown = ModKeyMappings.isDown(keyDropStack) && stack.getCount() > 1;
                 if (dropDelayCounter == 0)
                     wasDropStackDown = isDropStackDown;
                 else if (wasDropStackDown != isDropStackDown) {

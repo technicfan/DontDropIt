@@ -1,9 +1,8 @@
-package adudecalledleo.dontdropit.mixin.handledscreen;
+package adudecalledleo.dontdropit.mixin.abstractcontainerscreen;
 
 import adudecalledleo.dontdropit.config.FavoredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
-import adudecalledleo.dontdropit.mixin.KeyBindingAccessor;
-import adudecalledleo.dontdropit.mixin.SlotAccessor;
+import adudecalledleo.dontdropit.mixin.KeyMappingAccessor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -21,12 +20,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class HandledScreenMixin_InterceptClose<T extends AbstractContainerMenu> extends Screen {
+public abstract class AbstractContainerScreenMixin_InterceptClose<T extends AbstractContainerMenu> extends Screen {
     @Shadow @Final protected T menu;
 
     @Shadow protected abstract void slotClicked(Slot slot, int slotId, int button, ClickType actionType);
 
-    private HandledScreenMixin_InterceptClose() {
+    private AbstractContainerScreenMixin_InterceptClose() {
         super(Component.empty());
         throw new RuntimeException("Mixin constructor called");
     }
@@ -44,7 +43,7 @@ public abstract class HandledScreenMixin_InterceptClose<T extends AbstractContai
             return;
         // eat all drop key presses, so we don't drop hotbar items if drop delay is disabled
         minecraft.options.keyDrop.setDown(false);
-        ((KeyBindingAccessor) minecraft.options.keyDrop).setTimesPressed(0);
+        ((KeyMappingAccessor) minecraft.options.keyDrop).setTimesPressed(0);
 
         ItemStack cursorStack = menu.getCarried();
         boolean canDrop = true;
@@ -67,7 +66,7 @@ public abstract class HandledScreenMixin_InterceptClose<T extends AbstractContai
             // locate handler slot ID that matches the target inventory slot ID
             Slot targetSlot = null;
             for (Slot slot : menu.slots) {
-                if (slot.container == playerInventory && ((SlotAccessor) slot).getInventoryIndex() == targetInvId) {
+                if (slot.container == playerInventory && slot.getContainerSlot() == targetInvId) {
                     targetSlot = slot;
                     break;
                 }

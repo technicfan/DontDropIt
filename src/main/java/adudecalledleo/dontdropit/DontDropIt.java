@@ -39,7 +39,7 @@ public class DontDropIt implements ClientModInitializer, DontDropItApi {
                     data.postUpdate();
                     return InteractionResult.PASS;
                 });
-        ModKeyBindings.register();
+        ModKeyMappings.register();
         IgnoredSlots.collectFromEntrypoints();
         ClientTickEvents.END_CLIENT_TICK.register(DropDelayHandler::tick);
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((client, world) -> {

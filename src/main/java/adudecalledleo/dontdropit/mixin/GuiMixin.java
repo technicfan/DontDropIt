@@ -12,9 +12,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public abstract class InGameHudMixin {
+public abstract class GuiMixin {
     @Inject(method = "renderSlot", at = @At(value = "TAIL"))
-    public void renderHotbarDropProgress(GuiGraphics context, int x, int y, DeltaTracker tickCounter, Player player, ItemStack stack, int seed, CallbackInfo ci) {
-        DropDelayRenderer.renderOverlay(context, stack, x, y);
+    public void renderHotbarDropProgress(GuiGraphics graphics, int x, int y, DeltaTracker tickCounter, Player player, ItemStack stack, int seed, CallbackInfo ci) {
+        DropDelayRenderer.renderOverlay(graphics, stack, x, y);
     }
 }

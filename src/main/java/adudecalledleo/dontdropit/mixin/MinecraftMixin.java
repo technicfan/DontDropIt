@@ -7,11 +7,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Minecraft.class)
-public abstract class MinecraftClientMixin {
+public abstract class MinecraftMixin {
     @Redirect(method = "handleKeybinds",
               at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;consumeClick()Z",
                        ordinal = 8))
-    public boolean disableDropKey(KeyMapping binding) {
+    public boolean disableDropKey(KeyMapping keyMapping) {
         return false;
     }
 }

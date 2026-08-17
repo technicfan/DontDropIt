@@ -5,8 +5,8 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 
-public class ModKeyBindings {
-    private ModKeyBindings() { }
+public class ModKeyMappings {
+    private ModKeyMappings() { }
 
     private static final KeyMapping.Category MOD_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(DontDropIt.MOD_ID, DontDropIt.MOD_ID));
 
@@ -20,13 +20,13 @@ public class ModKeyBindings {
     public static final KeyMapping[] all = new KeyMapping[] { keyDropStack, keyForceDrop, keyToggleDropDelay };
 
     public static void register() {
-        for (KeyMapping keyBinding : all)
-            KeyBindingHelper.registerKeyBinding(keyBinding);
+        for (KeyMapping keyMapping : all)
+            KeyBindingHelper.registerKeyBinding(keyMapping);
     }
 
-    public static boolean isDown(KeyMapping keyBinding) {
-        if (keyBinding.isUnbound())
+    public static boolean isDown(KeyMapping keyMapping) {
+        if (keyMapping.isUnbound())
             return false;
-        return keyBinding.isDown();
+        return keyMapping.isDown();
     }
 }

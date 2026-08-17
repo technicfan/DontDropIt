@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import adudecalledleo.dontdropit.ModKeyBindings;
+import adudecalledleo.dontdropit.ModKeyMappings;
 
 public class FavoredChecker {
     private static final HashSet<Item> FAVORED_ITEMS = new HashSet<>();
@@ -94,7 +94,7 @@ public class FavoredChecker {
     }
 
     public static boolean canDropStack(ItemStack stack) {
-        if (ModKeyBindings.isDown(ModKeyBindings.keyForceDrop))
+        if (ModKeyMappings.isDown(ModKeyMappings.keyForceDrop))
             return true;
         return !isStackFavored(stack);
     }

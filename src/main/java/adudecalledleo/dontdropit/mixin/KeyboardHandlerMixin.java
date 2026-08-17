@@ -2,7 +2,7 @@ package adudecalledleo.dontdropit.mixin;
 
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
-import adudecalledleo.dontdropit.ModKeyBindings;
+import adudecalledleo.dontdropit.ModKeyMappings;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(KeyboardHandler.class)
-public abstract class KeyboardMixin {
+public abstract class KeyboardHandlerMixin {
     @Shadow @Final private Minecraft minecraft;
 
     @Inject(method = "keyPress", at = @At(value = "HEAD"))
@@ -36,7 +36,7 @@ public abstract class KeyboardMixin {
             if (minecraft.options.keyDrop.matches(input))
                 targetBinding = minecraft.options.keyDrop;
             else {
-                for (KeyMapping keyBinding : ModKeyBindings.all) {
+                for (KeyMapping keyBinding : ModKeyMappings.all) {
                     if (keyBinding.matches(input)) {
                         targetBinding = keyBinding;
                         break;
@@ -49,7 +49,7 @@ public abstract class KeyboardMixin {
                 targetBinding.setDown(false);
             else {
                 targetBinding.setDown(true);
-                ((KeyBindingAccessor) targetBinding).setTimesPressed(((KeyBindingAccessor) targetBinding).getTimesPressed() + 1);
+                ((KeyMappingAccessor) targetBinding).setTimesPressed(((KeyMappingAccessor) targetBinding).getTimesPressed() + 1);
             }
         }
     }

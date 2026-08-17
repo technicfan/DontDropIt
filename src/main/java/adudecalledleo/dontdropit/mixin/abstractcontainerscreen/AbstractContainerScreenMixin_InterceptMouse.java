@@ -1,4 +1,4 @@
-package adudecalledleo.dontdropit.mixin.handledscreen;
+package adudecalledleo.dontdropit.mixin.abstractcontainerscreen;
 
 import java.util.ArrayList;
 import net.minecraft.ChatFormatting;
@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import adudecalledleo.dontdropit.ModKeyBindings;
+import adudecalledleo.dontdropit.ModKeyMappings;
 import adudecalledleo.dontdropit.config.DropBehaviorOverride;
 import adudecalledleo.dontdropit.config.FavoredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
@@ -25,10 +25,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import static adudecalledleo.dontdropit.ModKeyBindings.keyForceDrop;
+import static adudecalledleo.dontdropit.ModKeyMappings.keyForceDrop;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class HandledScreenMixin_InterceptMouse<T extends AbstractContainerMenu> extends Screen {
+public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends AbstractContainerMenu> extends Screen {
     @Shadow @Final protected T menu;
     @Shadow protected int leftPos;
     @Shadow protected int topPos;
@@ -37,7 +37,7 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends AbstractContai
     @Shadow protected abstract void slotClicked(Slot slot, int invSlot, int clickData, ClickType actionType);
     @Shadow protected abstract boolean hasClickedOutside(double mouseX, double mouseY, int left, int top);
 
-    private HandledScreenMixin_InterceptMouse() {
+    private AbstractContainerScreenMixin_InterceptMouse() {
         super(Component.empty());
         throw new RuntimeException("Mixin constructor called");
     }
@@ -110,7 +110,7 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends AbstractContai
             return;
         }
         ItemStack cursorStack = menu.getCarried();
-        boolean forceDrop = ModKeyBindings.isDown(ModKeyBindings.keyForceDrop);
+        boolean forceDrop = ModKeyMappings.isDown(ModKeyMappings.keyForceDrop);
         boolean canDrop = true;
         switch (oobDropClickOverride) {
         case FAVORITE_ITEMS:
@@ -126,12 +126,12 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends AbstractContai
     }
 
     @Inject(method = "renderTooltip", at = @At("HEAD"))
-    public void drawDropBlockTooltip(GuiGraphics context, int mouseX, int mouseY, CallbackInfo ci) {
+    public void drawDropBlockTooltip(GuiGraphics graphics, int mouseX, int mouseY, CallbackInfo ci) {
         ItemStack cursorStack = menu.getCarried();
         if (cursorStack.isEmpty() || !hasClickedOutside(mouseX, mouseY, leftPos, topPos))
             return;
         ArrayList<Component> tooltipTexts = new ArrayList<>();
-        boolean forceDrop = ModKeyBindings.isDown(keyForceDrop);
+        boolean forceDrop = ModKeyMappings.isDown(keyForceDrop);
         boolean canDrop = false;
         switch (ModConfig.get().general.oobDropClickOverride) {
         case FAVORITE_ITEMS:
@@ -165,6 +165,6 @@ public abstract class HandledScreenMixin_InterceptMouse<T extends AbstractContai
                                 .withStyle(style -> style.withBold(true).withColor(ChatFormatting.WHITE))))
                         .withStyle(style -> style.withColor(ChatFormatting.GRAY)));
         }
-        context.setComponentTooltipForNextFrame(font, tooltipTexts, mouseX, mouseY);
+        graphics.setComponentTooltipForNextFrame(font, tooltipTexts, mouseX, mouseY);
     }
 }

@@ -1,21 +1,20 @@
 {
-  "required": true,
-  "minVersion": "0.8",
-  "package": "adudecalledleo.dontdropit.mixin",
-  "compatibilityLevel": "JAVA_17",
-  "client": [
-    "InGameHudMixin",
-    "KeyBindingAccessor",
-    "KeyboardMixin",
-    "MinecraftClientMixin",
-    "MouseMixin",
-    "SlotAccessor",
-    "handledscreen.HandledScreenAccessor",
-    "handledscreen.HandledScreenMixin_HooksAndMisc",
-    "handledscreen.HandledScreenMixin_InterceptClose",
-    "handledscreen.HandledScreenMixin_InterceptMouse"
-  ],
-  "injectors": {
-    "defaultRequire": 1
-  }
+    "required": true,
+    "minVersion": "0.8",
+    "package": "adudecalledleo.dontdropit.mixin",
+    "compatibilityLevel": "JAVA_21",
+    "client": [
+        "GuiMixin",
+        "KeyMappingAccessor",
+        "KeyboardHandlerMixin",
+        "MinecraftMixin",
+        "MouseHandlerMixin",
+        "abstractcontainerscreen.AbstractContainerScreenAccessor",
+        "abstractcontainerscreen.AbstractContainerScreenMixin_HooksAndMisc",
+        "abstractcontainerscreen.AbstractContainerScreenMixin_InterceptClose",
+        "abstractcontainerscreen.AbstractContainerScreenMixin_InterceptMouse"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
 }
