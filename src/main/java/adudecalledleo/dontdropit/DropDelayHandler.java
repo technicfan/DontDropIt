@@ -8,10 +8,9 @@ import adudecalledleo.dontdropit.config.FavoredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import adudecalledleo.dontdropit.duck.HandledScreenHooks;
 import adudecalledleo.dontdropit.mixin.KeyBindingAccessor;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 public class DropDelayHandler {
     private static long dropDelayCounter;
@@ -29,7 +28,7 @@ public class DropDelayHandler {
         reset();
     }
 
-    public static void tick(MinecraftClient client) {
+    public static void tick(Minecraft client) {
         if (client.player == null) {
             reset();
             wasToggleDelayDown = false;
@@ -44,40 +43,40 @@ public class DropDelayHandler {
             }
         } else
             wasToggleDelayDown = false;
-        if (client.currentScreen != null) {
-            if (client.currentScreen instanceof HandledScreenHooks)
-                tickOnHandledScreen(client, (HandledScreenHooks) client.currentScreen);
+        if (client.screen != null) {
+            if (client.screen instanceof HandledScreenHooks)
+                tickOnHandledScreen(client, (HandledScreenHooks) client.screen);
             else
                 reset();
         } else
             tickNormally(client);
     }
 
-    private static void tickNormally(MinecraftClient client) {
+    private static void tickNormally(Minecraft client) {
         if (client.player == null)
             return;
-        ItemStack stack = client.player.getInventory().getSelectedStack();
+        ItemStack stack = client.player.getInventory().getSelectedItem();
         if (ModConfig.get().dropDelay.isEnabled(stack)) {
             if (client.player.isSpectator()) {
                 reset();
                 return;
             }
             doDropProgress(client, stack, entireStack -> {
-                if (client.player.dropSelectedItem(entireStack))
-                    client.player.swingHand(Hand.MAIN_HAND);
+                if (client.player.drop(entireStack))
+                    client.player.swing(InteractionHand.MAIN_HAND);
             });
         } else {
             reset();
-            while (client.options.dropKey.wasPressed()) {
+            while (client.options.keyDrop.consumeClick()) {
                 if (FavoredChecker.isStackFavored(stack))
                     continue;
-                if (!client.player.isSpectator() && client.player.dropSelectedItem(ModKeyBindings.isDown(keyDropStack)))
-                    client.player.swingHand(Hand.MAIN_HAND);
+                if (!client.player.isSpectator() && client.player.drop(ModKeyBindings.isDown(keyDropStack)))
+                    client.player.swing(InteractionHand.MAIN_HAND);
             }
         }
     }
 
-    private static void tickOnHandledScreen(MinecraftClient client, HandledScreenHooks screenHooks) {
+    private static void tickOnHandledScreen(Minecraft client, HandledScreenHooks screenHooks) {
         if (client.player == null)
             return;
         ItemStack stack = screenHooks.dontdropit_getSelectedStack();
@@ -97,9 +96,9 @@ public class DropDelayHandler {
         void drop(boolean entireStack);
     }
 
-    private static void doDropProgress(MinecraftClient client, ItemStack stack, DropAction dropAction) {
-        if (ModKeyBindings.isDown(client.options.dropKey)) {
-            ((KeyBindingAccessor) client.options.dropKey).setTimesPressed(0); // eat all presses!
+    private static void doDropProgress(Minecraft client, ItemStack stack, DropAction dropAction) {
+        if (ModKeyBindings.isDown(client.options.keyDrop)) {
+            ((KeyBindingAccessor) client.options.keyDrop).setTimesPressed(0); // eat all presses!
             if (dropDelayCounter < getCounterMax()) {
                 boolean isDropStackDown = ModKeyBindings.isDown(keyDropStack) && stack.getCount() > 1;
                 if (dropDelayCounter == 0)

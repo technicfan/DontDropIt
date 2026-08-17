@@ -4,6 +4,14 @@ import adudecalledleo.dontdropit.config.FavoredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import adudecalledleo.dontdropit.mixin.KeyBindingAccessor;
 import adudecalledleo.dontdropit.mixin.SlotAccessor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,42 +20,33 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
+@Mixin(AbstractContainerScreen.class)
+public abstract class HandledScreenMixin_InterceptClose<T extends AbstractContainerMenu> extends Screen {
+    @Shadow @Final protected T menu;
 
-@Mixin(HandledScreen.class)
-public abstract class HandledScreenMixin_InterceptClose<T extends ScreenHandler> extends Screen {
-    @Shadow @Final protected T handler;
-
-    @Shadow protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
+    @Shadow protected abstract void slotClicked(Slot slot, int slotId, int button, ClickType actionType);
 
     private HandledScreenMixin_InterceptClose() {
-        super(Text.empty());
+        super(Component.empty());
         throw new RuntimeException("Mixin constructor called");
     }
 
-    @Unique private PlayerInventory playerInventory;
+    @Unique private Inventory playerInventory;
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    private void capturePlayerInventory(T handler, PlayerInventory inventory, Text title, CallbackInfo ci) {
+    private void capturePlayerInventory(T handler, Inventory inventory, Component title, CallbackInfo ci) {
         this.playerInventory = inventory;
     }
 
-    @Inject(method = "close", at = @At("HEAD"))
+    @Inject(method = "onClose", at = @At("HEAD"))
     public void cursorCloseDropOverride(CallbackInfo ci) {
-        if (client == null || client.player == null)
+        if (minecraft == null || minecraft.player == null)
             return;
         // eat all drop key presses, so we don't drop hotbar items if drop delay is disabled
-        client.options.dropKey.setPressed(false);
-        ((KeyBindingAccessor) client.options.dropKey).setTimesPressed(0);
+        minecraft.options.keyDrop.setDown(false);
+        ((KeyBindingAccessor) minecraft.options.keyDrop).setTimesPressed(0);
 
-        ItemStack cursorStack = handler.getCursorStack();
+        ItemStack cursorStack = menu.getCarried();
         boolean canDrop = true;
         switch (ModConfig.get().general.cursorCloseDropOverride) {
         case FAVORITE_ITEMS:
@@ -61,21 +60,21 @@ public abstract class HandledScreenMixin_InterceptClose<T extends ScreenHandler>
         if (cursorStack.isEmpty() || canDrop)
             return;
         int targetInvId;
-        targetInvId = playerInventory.getEmptySlot();
+        targetInvId = playerInventory.getFreeSlot();
         if (targetInvId < 0)
-            targetInvId = playerInventory.getOccupiedSlotWithRoomForStack(cursorStack);
+            targetInvId = playerInventory.getSlotWithRemainingSpace(cursorStack);
         if (targetInvId >= 0) {
             // locate handler slot ID that matches the target inventory slot ID
             Slot targetSlot = null;
-            for (Slot slot : handler.slots) {
-                if (slot.inventory == playerInventory && ((SlotAccessor) slot).getInventoryIndex() == targetInvId) {
+            for (Slot slot : menu.slots) {
+                if (slot.container == playerInventory && ((SlotAccessor) slot).getInventoryIndex() == targetInvId) {
                     targetSlot = slot;
                     break;
                 }
             }
             if (targetSlot == null)
                 return;
-            onMouseClick(targetSlot, -1, 0, SlotActionType.PICKUP);
+            slotClicked(targetSlot, -1, 0, ClickType.PICKUP);
         }
     }
 }

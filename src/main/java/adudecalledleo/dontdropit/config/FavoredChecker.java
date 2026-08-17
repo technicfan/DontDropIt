@@ -3,20 +3,19 @@ package adudecalledleo.dontdropit.config;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import adudecalledleo.dontdropit.ModKeyBindings;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
 
 public class FavoredChecker {
     private static final HashSet<Item> FAVORED_ITEMS = new HashSet<>();
@@ -25,22 +24,22 @@ public class FavoredChecker {
     private static final HashSet<TagKey<Enchantment>> FAVORED_ENCHANTMENT_TAGS = new HashSet<>();
 
     public static void updateFavoredSets(ModConfig config) {
-        updateFavoredSet(FAVORED_ITEMS, config.favorites.items, Registries.ITEM::getOptionalValue);
+        updateFavoredSet(FAVORED_ITEMS, config.favorites.items, BuiltInRegistries.ITEM::getOptional);
         updateFavoredSet(FAVORED_ITEM_TAGS, config.favorites.itemTags, id -> {
-            var key = TagKey.of(Registries.ITEM.getKey(), id);
-            if (Registries.ITEM.containsId(id)) {
+            var key = TagKey.create(BuiltInRegistries.ITEM.key(), id);
+            if (BuiltInRegistries.ITEM.containsKey(id)) {
                 return Optional.of(key);
             } else {
                 return Optional.empty();
             }
         });
-        if (MinecraftClient.getInstance().world != null) {
+        if (Minecraft.getInstance().level != null) {
             try {
-                Registry<Enchantment> enchantmentRegistry = MinecraftClient.getInstance().world.getRegistryManager().getOrThrow(RegistryKeys.ENCHANTMENT);
-                updateFavoredSet(FAVORED_ENCHANTMENTS, config.favorites.enchantments, enchantmentRegistry::getOptionalValue);
+                Registry<Enchantment> enchantmentRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+                updateFavoredSet(FAVORED_ENCHANTMENTS, config.favorites.enchantments, enchantmentRegistry::getOptional);
                 updateFavoredSet(FAVORED_ENCHANTMENT_TAGS, config.favorites.enchantmentTags, id -> {
-                    var key = TagKey.of(RegistryKeys.ENCHANTMENT, id);
-                    if (enchantmentRegistry.containsId(id)) {
+                    var key = TagKey.create(Registries.ENCHANTMENT, id);
+                    if (enchantmentRegistry.containsKey(id)) {
                         return Optional.of(key);
                     } else {
                         return Optional.empty();
@@ -71,13 +70,13 @@ public class FavoredChecker {
             return false;
         if (FAVORED_ITEMS.contains(stack.getItem()))
             return true;
-        if (FAVORED_ITEM_TAGS.stream().anyMatch(stack::isIn))
+        if (FAVORED_ITEM_TAGS.stream().anyMatch(stack::is))
             return true;
-        Set<RegistryEntry<Enchantment>> enchs = EnchantmentHelper.getEnchantments(stack).getEnchantments();
-        for (RegistryEntry<Enchantment> enchEntry : enchs) {
+        Set<Holder<Enchantment>> enchs = EnchantmentHelper.getEnchantmentsForCrafting(stack).keySet();
+        for (Holder<Enchantment> enchEntry : enchs) {
             boolean matching = FAVORED_ENCHANTMENTS.contains(enchEntry.value());
             if (!matching) {
-                matching = FAVORED_ENCHANTMENT_TAGS.stream().anyMatch(enchEntry::isIn);
+                matching = FAVORED_ENCHANTMENT_TAGS.stream().anyMatch(enchEntry::is);
             }
             if (!matching) {
                 continue;
@@ -85,7 +84,7 @@ public class FavoredChecker {
 
             boolean valid = true;
             if (config.favorites.enchIgnoreInvalidTargets && !(stack.getItem() == Items.ENCHANTED_BOOK)) {
-                valid = enchEntry.value().isAcceptableItem(stack);
+                valid = enchEntry.value().canEnchant(stack);
             }
             if (valid) {
                 return true;

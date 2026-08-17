@@ -13,14 +13,12 @@ import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
-
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.inventory.Slot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
 
 public class DontDropIt implements ClientModInitializer, DontDropItApi {
     public static final String MOD_ID = "dontdropit";
@@ -29,7 +27,7 @@ public class DontDropIt implements ClientModInitializer, DontDropItApi {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     public static Identifier id(String path) {
-        return Identifier.of(MOD_ID, path);
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     @Override
@@ -39,7 +37,7 @@ public class DontDropIt implements ClientModInitializer, DontDropItApi {
         AutoConfig.register(ModConfig.class, JanksonConfigSerializer::new)
                 .registerSaveListener((manager, data) -> {
                     data.postUpdate();
-                    return ActionResult.PASS;
+                    return InteractionResult.PASS;
                 });
         ModKeyBindings.register();
         IgnoredSlots.collectFromEntrypoints();
@@ -54,6 +52,6 @@ public class DontDropIt implements ClientModInitializer, DontDropItApi {
 
     @Override
     public Set<Class<? extends Slot>> getIgnoredDropDelaySlots() {
-        return Collections.singleton(CreativeInventoryScreen.LockableSlot.class);
+        return Collections.singleton(CreativeModeInventoryScreen.CustomCreativeSlot.class);
     }
 }

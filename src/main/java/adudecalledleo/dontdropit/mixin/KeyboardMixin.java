@@ -3,6 +3,12 @@ package adudecalledleo.dontdropit.mixin;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import adudecalledleo.dontdropit.ModKeyBindings;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.KeyboardHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.KeyEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -10,35 +16,28 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.Keyboard;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.client.option.KeyBinding;
-
-@Mixin(Keyboard.class)
+@Mixin(KeyboardHandler.class)
 public abstract class KeyboardMixin {
-    @Shadow @Final private MinecraftClient client;
+    @Shadow @Final private Minecraft minecraft;
 
-    @Inject(method = "onKey", at = @At(value = "HEAD"))
-    public void updateModKeys(long window, int action, KeyInput input, CallbackInfo ci) {
+    @Inject(method = "keyPress", at = @At(value = "HEAD"))
+    public void updateModKeys(long window, int action, KeyEvent input, CallbackInfo ci) {
         // this forces our key bindings (and the drop key binding) to be updated in handled screens
         // this allows scancodes to work properly, since you can't poll them via GLFW
-        if (client.getWindow().getHandle() == window && client.currentScreen instanceof HandledScreen<?> screen) {
-            if (screen.getFocused() instanceof TextFieldWidget textFieldWidget) {
-                if (textFieldWidget.isActive()) {
+        if (minecraft.getWindow().handle() == window && minecraft.screen instanceof AbstractContainerScreen<?> screen) {
+            if (screen.getFocused() instanceof EditBox textFieldWidget) {
+                if (textFieldWidget.canConsumeInput()) {
                     // a text field widget is active, don't update keys!
                     return;
                 }
             }
 
-            KeyBinding targetBinding = null;
-            if (client.options.dropKey.matchesKey(input))
-                targetBinding = client.options.dropKey;
+            KeyMapping targetBinding = null;
+            if (minecraft.options.keyDrop.matches(input))
+                targetBinding = minecraft.options.keyDrop;
             else {
-                for (KeyBinding keyBinding : ModKeyBindings.all) {
-                    if (keyBinding.matchesKey(input)) {
+                for (KeyMapping keyBinding : ModKeyBindings.all) {
+                    if (keyBinding.matches(input)) {
                         targetBinding = keyBinding;
                         break;
                     }
@@ -47,9 +46,9 @@ public abstract class KeyboardMixin {
             if (targetBinding == null)
                 return;
             if (action == GLFW_RELEASE)
-                targetBinding.setPressed(false);
+                targetBinding.setDown(false);
             else {
-                targetBinding.setPressed(true);
+                targetBinding.setDown(true);
                 ((KeyBindingAccessor) targetBinding).setTimesPressed(((KeyBindingAccessor) targetBinding).getTimesPressed() + 1);
             }
         }

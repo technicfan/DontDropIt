@@ -1,33 +1,32 @@
 package adudecalledleo.dontdropit;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 
 public class ModKeyBindings {
     private ModKeyBindings() { }
 
-    private static final KeyBinding.Category MOD_CATEGORY = KeyBinding.Category.create(Identifier.of(DontDropIt.MOD_ID, DontDropIt.MOD_ID));
+    private static final KeyMapping.Category MOD_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(DontDropIt.MOD_ID, DontDropIt.MOD_ID));
 
-    public static final KeyBinding keyDropStack = new KeyBinding("key.dontdropit.dropStack",
-            InputUtil.GLFW_KEY_LEFT_CONTROL, MOD_CATEGORY);
-    public static final KeyBinding keyForceDrop = new KeyBinding("key.dontdropit.forceDrop",
-            InputUtil.GLFW_KEY_LEFT_ALT, MOD_CATEGORY);
-    public static final KeyBinding keyToggleDropDelay = new KeyBinding("key.dontdropit.toggleDropDelay",
-            InputUtil.UNKNOWN_KEY.getCode(), MOD_CATEGORY);
+    public static final KeyMapping keyDropStack = new KeyMapping("key.dontdropit.dropStack",
+            InputConstants.KEY_LCONTROL, MOD_CATEGORY);
+    public static final KeyMapping keyForceDrop = new KeyMapping("key.dontdropit.forceDrop",
+            InputConstants.KEY_LALT, MOD_CATEGORY);
+    public static final KeyMapping keyToggleDropDelay = new KeyMapping("key.dontdropit.toggleDropDelay",
+            InputConstants.UNKNOWN.getValue(), MOD_CATEGORY);
 
-    public static final KeyBinding[] all = new KeyBinding[] { keyDropStack, keyForceDrop, keyToggleDropDelay };
+    public static final KeyMapping[] all = new KeyMapping[] { keyDropStack, keyForceDrop, keyToggleDropDelay };
 
     public static void register() {
-        for (KeyBinding keyBinding : all)
+        for (KeyMapping keyBinding : all)
             KeyBindingHelper.registerKeyBinding(keyBinding);
     }
 
-    public static boolean isDown(KeyBinding keyBinding) {
+    public static boolean isDown(KeyMapping keyBinding) {
         if (keyBinding.isUnbound())
             return false;
-        return keyBinding.isPressed();
+        return keyBinding.isDown();
     }
 }

@@ -1,8 +1,7 @@
 package adudecalledleo.dontdropit.api;
 
-import net.minecraft.screen.slot.Slot;
-
 import java.util.Set;
+import net.minecraft.world.inventory.Slot;
 
 public interface DontDropItApi {
     /**

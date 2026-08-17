@@ -1,6 +1,6 @@
 package adudecalledleo.dontdropit.duck;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 public interface HandledScreenHooks {
     boolean dontdropit_canDrop();

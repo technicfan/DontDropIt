@@ -6,10 +6,9 @@ import java.util.Locale;
 import me.shedaniel.autoconfig.AutoConfigClient;
 import me.shedaniel.autoconfig.ConfigData;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 import static me.shedaniel.autoconfig.util.Utils.getUnsafely;
 import static me.shedaniel.autoconfig.util.Utils.setUnsafely;
@@ -25,17 +24,17 @@ public enum DelayActivationMode {
         };
     }
 
-    public static Text toText(Object obj) {
+    public static Component toText(Object obj) {
         if (obj instanceof DelayActivationMode thiz) {
             var text =
-                    Text.translatable("text.autoconfig.dontdropit.general.delayed_drop."
+                    Component.translatable("text.autoconfig.dontdropit.general.delayed_drop."
                             + thiz.name().toLowerCase(Locale.ROOT));
             if (thiz == DISABLED) {
-                text = text.styled(style -> style.withColor(Formatting.RED));
+                text = text.withStyle(style -> style.withColor(ChatFormatting.RED));
             }
             return text;
         } else {
-            return Text.empty();
+            return Component.empty();
         }
     }
 
@@ -46,7 +45,7 @@ public enum DelayActivationMode {
         AutoConfigClient.getGuiRegistry(configClass).registerTypeProvider((i13n, field, config, defaults, registry) ->
                 Collections.singletonList(
                         entryBuilder.startSelector(
-                                Text.translatable(i13n),
+                                Component.translatable(i13n),
                                         VALUES,
                                         getUnsafely(field, config, getUnsafely(field, defaults)))
                                 .setDefaultValue(() -> getUnsafely(field, defaults))

@@ -6,8 +6,7 @@ import it.unimi.dsi.fastutil.objects.Reference2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.screen.slot.Slot;
-
+import net.minecraft.world.inventory.Slot;
 import java.util.List;
 
 public class IgnoredSlots {
