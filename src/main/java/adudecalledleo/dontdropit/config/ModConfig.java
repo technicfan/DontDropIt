@@ -14,10 +14,12 @@ import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.Comment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
+import net.minecraft.core.HolderSet.Named;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -119,7 +121,8 @@ public class ModConfig implements ConfigData {
             if (Minecraft.getInstance().level != null) {
                 try {
                     Registry<Enchantment> enchantmentRegistry = Minecraft.getInstance().level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-                    return enchantmentRegistry.keySet().stream().map(id -> id.toString()).toList();
+                    Named<Enchantment> curses = enchantmentRegistry.getOrThrow(EnchantmentTags.CURSE);
+                    return enchantmentRegistry.keySet().stream().filter(id -> !curses.stream().anyMatch(entry -> entry.value().equals(enchantmentRegistry.getValue(id)))).map(id -> id.toString()).toList();
                 } catch (IllegalStateException e) {}
             }
             return List.of(Enchantments.class.getDeclaredFields()).stream()
