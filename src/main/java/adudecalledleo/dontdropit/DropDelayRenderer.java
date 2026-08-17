@@ -41,9 +41,7 @@ public class DropDelayRenderer {
     public static void renderOverlay(GuiGraphics graphics, ItemStack stack, int x, int y) {
         if (stack.isEmpty())
             return;
-        graphics.pose().pushMatrix();
         renderFavoriteIcon(graphics, stack, x - 1, y - 1);
         renderProgressOverlay(graphics, stack, x, y, 16, 16);
-        graphics.pose().popMatrix();
     }
 }

@@ -3,12 +3,11 @@ package adudecalledleo.dontdropit;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.resources.Identifier;
 
 public class ModKeyMappings {
     private ModKeyMappings() { }
 
-    private static final KeyMapping.Category MOD_CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(DontDropIt.MOD_ID, DontDropIt.MOD_ID));
+    private static final KeyMapping.Category MOD_CATEGORY = KeyMapping.Category.register(DontDropIt.id(DontDropIt.MOD_ID));
 
     public static final KeyMapping keyDropStack = new KeyMapping("key.dontdropit.dropStack",
             InputConstants.KEY_LCONTROL, MOD_CATEGORY);
