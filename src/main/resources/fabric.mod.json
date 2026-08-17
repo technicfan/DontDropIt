@@ -5,10 +5,10 @@
     "name": "Don't Drop It!",
     "description": "Prevents accidental dropping of items via various means.",
     "authors": ["ADudeCalledLeo"],
+    "contributors": ["technicfan"],
     "contact": {
-        "homepage": "https://curseforge.com/minecraft/mc-mods/dont-drop-it",
-        "sources": "https://github.com/ModsByLeo/DontDropIt",
-        "issues": "https://github.com/ModsByLeo/DontDropIt/issues"
+        "sources": "https://github.com/technicfan/DontDropIt",
+        "issues": "https://github.com/technicfan/DontDropIt/issues"
     },
     "license": "MIT",
     "icon": "assets/dontdropit/icon.png",
@@ -21,20 +21,8 @@
     "mixins": ["dontdropit.mixins.json"],
     "accessWidener": "dontdropit.accesswidener",
     "depends": {
-        "fabricloader": ">=0.9.3+build.207",
+        "fabricloader": ">=0.19.3",
         "fabric": "*",
         "minecraft": "1.21.11"
-    },
-    "breaks": {
-        "inventory_control_tweaks": "<=1.3.10"
-    },
-    "suggests": {
-        "modupdater": "*"
-    },
-    "custom": {
-        "modupdater": {
-            "strategy": "curseforge",
-            "projectID": 390383
-        }
     }
 }
