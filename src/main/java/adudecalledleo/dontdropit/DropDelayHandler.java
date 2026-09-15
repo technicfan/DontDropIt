@@ -66,7 +66,7 @@ public class DropDelayHandler {
                 if (minecraft.player.drop(entireStack))
                     minecraft.player.swing(InteractionHand.MAIN_HAND);
                 //?} else
-                /*minecraft.player.drop(entireStack);*/
+                /*minecraft.gameMode.dropItem(minecraft.player, entireStack);*/
             });
         } else {
             reset();
@@ -78,7 +78,7 @@ public class DropDelayHandler {
                     && minecraft.player.drop(ModKeyMappings.isDown(keyDropStack)))
                         minecraft.player.swing(InteractionHand.MAIN_HAND);
                 //?} else
-                /*) minecraft.player.drop(ModKeyMappings.isDown(keyDropStack));*/
+                /*) minecraft.gameMode.dropItem(minecraft.player, ModKeyMappings.isDown(keyDropStack));*/
             }
         }
     }
