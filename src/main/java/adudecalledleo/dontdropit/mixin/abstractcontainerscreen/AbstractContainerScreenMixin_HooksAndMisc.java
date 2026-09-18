@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
@@ -21,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static adudecalledleo.dontdropit.ModKeyMappings.keyDropStack;
 
@@ -54,6 +56,15 @@ public abstract class AbstractContainerScreenMixin_HooksAndMisc extends Screen i
     @Override
     public ItemStack dontdropit_getSelectedStack() {
         return hoveredSlot == null ? ItemStack.EMPTY : hoveredSlot.getItem();
+    }
+
+    @Inject(method = "checkHotbarKeyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;matches(Lnet/minecraft/client/input/KeyEvent;)Z", shift = At.Shift.BEFORE), cancellable = true)
+    private void checkFavouriteToggle(CallbackInfoReturnable<Boolean> cir) {
+        if (hoveredSlot.hasItem() && ModKeyMappings.isDown(ModKeyMappings.keyToggleFavourite)) {
+            ModConfig.get().toggleFavouriteItem(BuiltInRegistries.ITEM.getKey(hoveredSlot.getItem().getItem()).toString());
+            ModConfig.save();
+            cir.setReturnValue(true);
+        }
     }
 
     @Redirect(method = "keyPressed",

@@ -11,6 +11,7 @@
     "key.dontdropit.forceDrop": "Forcibly Drop Modifier",
     "key.dontdropit.dropStack": "Drop Entire Stack Modifier",
     "key.dontdropit.toggleDropDelay": "Toggle Drop Delay",
+    "key.dontdropit.toggleFavourite": "Toggle favourite state",
     "text.autoconfig.dontdropit.title": "Don't Drop It! Configuration",
     "text.autoconfig.dontdropit.category.general": "General",
     "text.autoconfig.dontdropit.option.general.oobDropClickOverride": "OOB Click Drop Behavior",

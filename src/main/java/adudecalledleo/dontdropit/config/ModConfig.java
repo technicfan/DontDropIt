@@ -225,4 +225,13 @@ public class ModConfig implements ConfigData {
         favorites.postUpdate();
         FavoredChecker.updateFavoredSets(this);
     }
+
+    public void toggleFavouriteItem(String id) {
+        if (favorites.items.contains(id)) {
+            favorites.items.removeIf(elem -> elem.equals(id));
+        } else {
+            favorites.items.add(id);
+        }
+        FavoredChecker.updateFavoredSets(this);
+    }
 }
