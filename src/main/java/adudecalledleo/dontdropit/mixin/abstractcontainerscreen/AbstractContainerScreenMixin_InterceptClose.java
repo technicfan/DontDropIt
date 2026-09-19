@@ -1,6 +1,6 @@
 package adudecalledleo.dontdropit.mixin.abstractcontainerscreen;
 
-import adudecalledleo.dontdropit.config.FavoredChecker;
+import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import adudecalledleo.dontdropit.mixin.KeyMappingAccessor;
 import net.minecraft.client.gui.screens.Screen;
@@ -48,8 +48,8 @@ public abstract class AbstractContainerScreenMixin_InterceptClose<T extends Abst
         ItemStack cursorStack = menu.getCarried();
         boolean canDrop = true;
         switch (ModConfig.get().general.cursorCloseDropOverride) {
-        case FAVORITE_ITEMS:
-            if (!FavoredChecker.isStackFavored(cursorStack))
+        case FAVOURITE_ITEMS:
+            if (!FavouredChecker.isStackFavoured(cursorStack))
                 break;
         case ALL_ITEMS:
             canDrop = false;

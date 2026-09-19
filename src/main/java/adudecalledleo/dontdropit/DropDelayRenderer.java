@@ -1,6 +1,6 @@
 package adudecalledleo.dontdropit;
 
-import adudecalledleo.dontdropit.config.FavoredChecker;
+import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -9,12 +9,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
 public class DropDelayRenderer {
-    private static final Identifier TEX_FAVORITE = DontDropIt.id("textures/gui/favorite.png");
+    private static final Identifier TEX_FAVOURITE = DontDropIt.id("textures/gui/favourite.png");
 
-    public static void renderFavoriteIcon(GuiGraphics graphics, ItemStack stack, int x, int y) {
-        if (!ModConfig.get().favorites.drawOverlay || !FavoredChecker.isStackFavored(stack))
+    public static void renderFavouriteIcon(GuiGraphics graphics, ItemStack stack, int x, int y) {
+        if (!ModConfig.get().favourites.drawOverlay || !FavouredChecker.isStackFavoured(stack))
             return;
-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEX_FAVORITE, x, y, 18, 18, 18, 18, 18, 18);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, TEX_FAVOURITE, x, y, 18, 18, 18, 18, 18, 18);
     }
 
     private static int pack(int r, int g, int b, int a) {
@@ -41,7 +41,7 @@ public class DropDelayRenderer {
     public static void renderOverlay(GuiGraphics graphics, ItemStack stack, int x, int y) {
         if (stack.isEmpty())
             return;
-        renderFavoriteIcon(graphics, stack, x - 1, y - 1);
+        renderFavouriteIcon(graphics, stack, x - 1, y - 1);
         renderProgressOverlay(graphics, stack, x, y, 16, 16);
     }
 }

@@ -6,7 +6,7 @@ import java.util.Set;
 import adudecalledleo.dontdropit.api.DontDropItApi;
 import adudecalledleo.dontdropit.config.DelayActivationMode;
 import adudecalledleo.dontdropit.config.DropBehaviorOverride;
-import adudecalledleo.dontdropit.config.FavoredChecker;
+import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.JanksonConfigSerializer;
@@ -44,7 +44,7 @@ public class DontDropIt implements ClientModInitializer, DontDropItApi {
         ClientTickEvents.END_CLIENT_TICK.register(DropDelayHandler::tick);
         ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register((minecraft, level) -> {
             if (level != null) {
-                FavoredChecker.updateFavoredSets(ModConfig.get());
+                FavouredChecker.updateFavouredSets(ModConfig.get());
             }
         });
         LOGGER.info("Don't drop that Diamond Pickaxe! (Don't Drop It! successfully initialized)");

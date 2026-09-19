@@ -14,12 +14,12 @@ import static me.shedaniel.autoconfig.util.Utils.getUnsafely;
 import static me.shedaniel.autoconfig.util.Utils.setUnsafely;
 
 public enum DelayActivationMode {
-    ENABLED, FAVORITES_ONLY, DISABLED;
+    ENABLED, FAVOURITES_ONLY, DISABLED;
 
     public boolean isEnabled(ItemStack stack) {
         return switch (this) {
             case DISABLED -> false;
-            case FAVORITES_ONLY -> FavoredChecker.isStackFavored(stack);
+            case FAVOURITES_ONLY -> FavouredChecker.isStackFavoured(stack);
             case ENABLED -> true;
         };
     }

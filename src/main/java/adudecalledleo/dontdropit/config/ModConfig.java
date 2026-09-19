@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import adudecalledleo.dontdropit.DontDropIt;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -36,7 +37,7 @@ public class ModConfig implements ConfigData {
 
     public static class General {
         @ConfigEntry.Gui.Tooltip(count = 2)
-        public DropBehaviorOverride oobDropClickOverride = DropBehaviorOverride.FAVORITE_ITEMS;
+        public DropBehaviorOverride oobDropClickOverride = DropBehaviorOverride.FAVOURITE_ITEMS;
         @ConfigEntry.Gui.Tooltip(count = 2)
         public DropBehaviorOverride cursorCloseDropOverride = DropBehaviorOverride.ALL_ITEMS;
     }
@@ -73,7 +74,7 @@ public class ModConfig implements ConfigData {
     @ConfigEntry.Gui.TransitiveObject
     public DropDelay dropDelay = new DropDelay();
 
-    public static class Favorites {
+    public static class Favourites {
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean enabled = true;
         @ConfigEntry.Gui.Tooltip(count = 2)
@@ -130,7 +131,7 @@ public class ModConfig implements ConfigData {
 
             boolean removeInvalidIds = true;
             if (restoreDefaults == null || restoreDefaults == Boolean.TRUE) {
-                // resets favored ID lists IF:
+                // resets favoured ID lists IF:
                 // 1. restoreDefaults was set to true (user wants to reset)
                 // 2. restoreDefaults is null and all lists are currently empty (newly created config)
                 if (restoreDefaults == Boolean.TRUE || (items.isEmpty() && itemTags.isEmpty()
@@ -168,12 +169,12 @@ public class ModConfig implements ConfigData {
                 String idStr = it.next();
                 Identifier id = Identifier.tryParse(idStr);
                 if (id == null) {
-                    LOGGER.warn("Favorites: Found invalid identifier \"{}\" in favored {} list, removing", idStr, listName);
+                    LOGGER.warn("Favourites: Found invalid identifier \"{}\" in favoured {} list, removing", idStr, listName);
                     it.remove();
                     continue;
                 }
                 if (!registry.containsKey(id)) {
-                    LOGGER.warn("Favorites: Found unregistered identifier \"{}\" in favored {} list, removing", id, listName);
+                    LOGGER.warn("Favourites: Found unregistered identifier \"{}\" in favoured {} list, removing", id, listName);
                     it.remove();
                 }
             }
@@ -185,22 +186,22 @@ public class ModConfig implements ConfigData {
                 String idStr = it.next();
                 Identifier id = Identifier.tryParse(idStr);
                 if (id == null) {
-                    LOGGER.warn("Favorites: Found invalid identifier \"{}\" in favored {} tags list, removing", idStr, description);
+                    LOGGER.warn("Favourites: Found invalid identifier \"{}\" in favoured {} tags list, removing", idStr, description);
                     it.remove();
                     continue;
                 }
                 // var tagKey = TagKey.of(registry.getKey(), id);
                 if (!registry.containsKey(id)) {
-                    LOGGER.warn("Favorites: Found unregistered identifier \"{}\" in favored {} tags list, removing", id, description);
+                    LOGGER.warn("Favourites: Found unregistered identifier \"{}\" in favoured {} tags list, removing", id, description);
                     it.remove();
                 }
             }
         }
     }
 
-    @ConfigEntry.Category("favorites")
+    @ConfigEntry.Category("favourites")
     @ConfigEntry.Gui.TransitiveObject
-    public Favorites favorites = new Favorites();
+    public Favourites favourites = new Favourites();
 
     @Override
     public void validatePostLoad() {
@@ -212,9 +213,9 @@ public class ModConfig implements ConfigData {
             LOGGER.warn("Drop Delay section is missing, resetting it to default values");
             dropDelay = new DropDelay();
         }
-        if (favorites == null) {
-            LOGGER.warn("Favorites section is missing, resetting it to default values");
-            favorites = new Favorites();
+        if (favourites == null) {
+            LOGGER.warn("Favourites section is missing, resetting it to default values");
+            favourites = new Favourites();
         }
 
         dropDelay.postLoad();
@@ -222,8 +223,8 @@ public class ModConfig implements ConfigData {
     }
 
     public void postUpdate() {
-        favorites.postUpdate();
-        FavoredChecker.updateFavoredSets(this);
+        favourites.postUpdate();
+        FavouredChecker.updateFavouredSets(this);
     }
 
     public void toggleFavouriteItem(String id) {
@@ -232,6 +233,6 @@ public class ModConfig implements ConfigData {
         } else {
             favourites.items = Stream.concat(favourites.items.stream(), Stream.of(id)).toList();
         }
-        FavoredChecker.updateFavoredSets(this);
+        FavouredChecker.updateFavouredSets(this);
     }
 }

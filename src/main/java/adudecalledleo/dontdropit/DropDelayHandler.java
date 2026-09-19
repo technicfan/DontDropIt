@@ -4,7 +4,7 @@ import static adudecalledleo.dontdropit.ModKeyMappings.keyDropStack;
 import static adudecalledleo.dontdropit.ModKeyMappings.keyToggleDropDelay;
 
 import adudecalledleo.dontdropit.config.DelayActivationMode;
-import adudecalledleo.dontdropit.config.FavoredChecker;
+import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import adudecalledleo.dontdropit.duck.HandledScreenHooks;
 import adudecalledleo.dontdropit.mixin.KeyMappingAccessor;
@@ -71,7 +71,7 @@ public class DropDelayHandler {
         } else {
             reset();
             while (minecraft.options.keyDrop.consumeClick()) {
-                if (FavoredChecker.isStackFavored(stack))
+                if (FavouredChecker.isStackFavoured(stack))
                     continue;
                 if (!minecraft.player.isSpectator()
                 //? if <=26.2 {
@@ -115,7 +115,7 @@ public class DropDelayHandler {
                     return;
                 }
                 if (ModConfig.get().dropDelay.mode == DelayActivationMode.ENABLED) {
-                    if (!FavoredChecker.canDropStack(stack)) {
+                    if (!FavouredChecker.canDropStack(stack)) {
                         dropDelayCounter = 0;
                         return;
                     }

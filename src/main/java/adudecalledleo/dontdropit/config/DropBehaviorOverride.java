@@ -13,7 +13,7 @@ import static me.shedaniel.autoconfig.util.Utils.getUnsafely;
 import static me.shedaniel.autoconfig.util.Utils.setUnsafely;
 
 public enum DropBehaviorOverride {
-    FAVORITE_ITEMS, ALL_ITEMS, DISABLED;
+    FAVOURITE_ITEMS, ALL_ITEMS, DISABLED;
 
     public static Component toText(Object obj) {
         if (obj instanceof DropBehaviorOverride thiz) {

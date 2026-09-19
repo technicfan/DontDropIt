@@ -3,7 +3,7 @@ package adudecalledleo.dontdropit.mixin.abstractcontainerscreen;
 import adudecalledleo.dontdropit.DropDelayRenderer;
 import adudecalledleo.dontdropit.IgnoredSlots;
 import adudecalledleo.dontdropit.ModKeyMappings;
-import adudecalledleo.dontdropit.config.FavoredChecker;
+import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import adudecalledleo.dontdropit.duck.HandledScreenHooks;
 import net.minecraft.client.KeyMapping;
@@ -77,7 +77,7 @@ public abstract class AbstractContainerScreenMixin_HooksAndMisc extends Screen i
         if (ModConfig.get().dropDelay.mode.isEnabled(stack))
             return false;
         return dontdropit_canDrop()
-                && FavoredChecker.canDropStack(dontdropit_getSelectedStack())
+                && FavouredChecker.canDropStack(dontdropit_getSelectedStack())
                 && keyBinding.matches(input);
     }
 

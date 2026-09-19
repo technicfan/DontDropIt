@@ -13,7 +13,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import adudecalledleo.dontdropit.ModKeyMappings;
 import adudecalledleo.dontdropit.config.DropBehaviorOverride;
-import adudecalledleo.dontdropit.config.FavoredChecker;
+import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,7 +46,7 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
 
     @Unique
     private boolean shouldAllowShiftClick(Slot slot, int invSlot, ClickType actionType) {
-        if (!ModConfig.get().favorites.disableShiftClick || actionType != ClickType.QUICK_MOVE) {
+        if (!ModConfig.get().favourites.disableShiftClick || actionType != ClickType.QUICK_MOVE) {
             return true;
         }
         if (slot == null && invSlot >= 0) {
@@ -55,11 +55,11 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
         if (slot == null) {
             return true;
         }
-        return !FavoredChecker.isStackFavored(slot.getItem());
+        return !FavouredChecker.isStackFavoured(slot.getItem());
     }
 
     @Unique
-    private void disableFavoredShiftClick(Slot slot, int invSlot, int clickData, ClickType actionType) {
+    private void disableFavouredShiftClick(Slot slot, int invSlot, int clickData, ClickType actionType) {
         if (shouldAllowShiftClick(slot, invSlot, actionType)) {
             slotClicked(slot, invSlot, clickData, actionType);
         }
@@ -72,7 +72,7 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V",
                     ordinal = 1, shift = At.Shift.BEFORE))
-    public void disableFavoredShiftClick_mouseClicked(CallbackInfoReturnable<Boolean> ci, @Local Slot slot, @Local(ordinal = 2) int invSlot, @Local ClickType actionType) {
+    public void disableFavouredShiftClick_mouseClicked(CallbackInfoReturnable<Boolean> ci, @Local Slot slot, @Local(ordinal = 2) int invSlot, @Local ClickType actionType) {
         dontdropit$cancelOnMouseClick = !shouldAllowShiftClick(slot, invSlot, actionType);
     }
 
@@ -90,9 +90,9 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
               at = @At(value = "INVOKE",
                        target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V",
                        ordinal = 0))
-    public void disableFavoredShiftClick_mouseReleasedDouble(@SuppressWarnings("rawtypes") AbstractContainerScreen handledScreen,
+    public void disableFavouredShiftClick_mouseReleasedDouble(@SuppressWarnings("rawtypes") AbstractContainerScreen handledScreen,
             Slot slot, int invSlot, int clickData, ClickType actionType) {
-        disableFavoredShiftClick(slot, invSlot, clickData, actionType);
+        disableFavouredShiftClick(slot, invSlot, clickData, actionType);
     }
 
     @Redirect(method = "mouseReleased",
@@ -102,7 +102,7 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
     public void oobClickDropOverride(@SuppressWarnings("rawtypes") AbstractContainerScreen handledScreen,
             Slot slot, int invSlot, int clickData, ClickType actionType) {
         if (actionType == ClickType.QUICK_MOVE) {
-            disableFavoredShiftClick(slot, invSlot, clickData, actionType);
+            disableFavouredShiftClick(slot, invSlot, clickData, actionType);
             return;
         }
         DropBehaviorOverride oobDropClickOverride = ModConfig.get().general.oobDropClickOverride;
@@ -114,8 +114,8 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
         boolean forceDrop = ModKeyMappings.isDown(ModKeyMappings.keyForceDrop);
         boolean canDrop = true;
         switch (oobDropClickOverride) {
-        case FAVORITE_ITEMS:
-            if (!FavoredChecker.isStackFavored(cursorStack))
+        case FAVOURITE_ITEMS:
+            if (!FavouredChecker.isStackFavoured(cursorStack))
                 break;
         case ALL_ITEMS:
             canDrop = false;
@@ -135,8 +135,8 @@ public abstract class AbstractContainerScreenMixin_InterceptMouse<T extends Abst
         boolean forceDrop = ModKeyMappings.isDown(keyForceDrop);
         boolean canDrop = false;
         switch (ModConfig.get().general.oobDropClickOverride) {
-        case FAVORITE_ITEMS:
-            if (FavoredChecker.isStackFavored(cursorStack))
+        case FAVOURITE_ITEMS:
+            if (FavouredChecker.isStackFavoured(cursorStack))
                 break;
         case DISABLED:
             canDrop = true;
