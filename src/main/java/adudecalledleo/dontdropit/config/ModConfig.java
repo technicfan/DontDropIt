@@ -227,10 +227,10 @@ public class ModConfig implements ConfigData {
     }
 
     public void toggleFavouriteItem(String id) {
-        if (favorites.items.contains(id)) {
-            favorites.items.removeIf(elem -> elem.equals(id));
+        if (favourites.items.contains(id)) {
+            favourites.items = favourites.items.stream().filter(elem -> !elem.equals(id)).toList();
         } else {
-            favorites.items.add(id);
+            favourites.items = Stream.concat(favourites.items.stream(), Stream.of(id)).toList();
         }
         FavoredChecker.updateFavoredSets(this);
     }
