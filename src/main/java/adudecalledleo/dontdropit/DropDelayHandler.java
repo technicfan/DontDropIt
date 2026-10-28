@@ -13,6 +13,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 public class DropDelayHandler {
+    private static int currentSlot = -1;
     private static long dropDelayCounter;
     private static ItemStack currentStack;
     private static boolean wasDropStackDown;
@@ -32,6 +33,12 @@ public class DropDelayHandler {
         if (minecraft.player == null) {
             reset();
             wasToggleDelayDown = false;
+            return;
+        }
+        int newSlot = minecraft.player.getInventory().getSelectedSlot();
+        if (newSlot != currentSlot) {
+            reset();
+            currentSlot = newSlot;
             return;
         }
         if (ModKeyMappings.isDown(keyToggleDropDelay)) {
