@@ -31,7 +31,7 @@ public class DropDelayRenderer {
         if (!ModConfig.get().dropDelay.mode.isEnabled(stack))
             return;
         if ((stack.getCount() > 1 && DropDelayHandler.isDroppingEntireStack())
-                || ModKeyMappings.isDown(ModKeyMappings.keyForceDrop))
+                || (ModKeyMappings.isDown(ModKeyMappings.keyForceDrop) && FavouredChecker.isStackFavoured(stack)))
             graphics.fill(x, y, x + w, y + h, COLOR_FORCE);
         long counter = DropDelayHandler.getCounter();
         int progHeight = Mth.floor((counter / (double) DropDelayHandler.getCounterMax()) * h);
