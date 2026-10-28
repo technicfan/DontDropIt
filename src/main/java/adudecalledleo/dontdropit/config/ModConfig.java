@@ -80,6 +80,8 @@ public class ModConfig implements ConfigData {
         @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean disableShiftClick = false;
         @ConfigEntry.Gui.Tooltip(count = 2)
+        public boolean disableFavKeyOutsideContainer = false;
+        @ConfigEntry.Gui.Tooltip(count = 2)
         public boolean drawOverlay = true;
         @ConfigEntry.Gui.Tooltip(count = 3)
         public Boolean restoreDefaults = null;

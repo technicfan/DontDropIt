@@ -29,12 +29,14 @@ public class ModKeyMappings {
         for (KeyMapping keyMapping : all)
             KeyBindingHelper.registerKeyBinding(keyMapping);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (keyToggleFavourite.consumeClick()) {
-                if (client.player != null && client/*?if >=26.2 {*//*.gui.screen()*//*?} else {*/.screen/*?}*/ == null) {
-                    ItemStack stack = client.player.getMainHandItem();
-                    if (stack != null && !stack.is(Items.AIR)) {
-                        ModConfig.get().toggleFavouriteItem(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
-                        ModConfig.save();
+            if (!ModConfig.get().favourites.disableFavKeyOutsideContainer) {
+                while (keyToggleFavourite.consumeClick()) {
+                    if (client.player != null && client/*?if >=26.2 {*//*.gui.screen()*//*?} else {*/.screen/*?}*/ == null) {
+                        ItemStack stack = client.player.getMainHandItem();
+                        if (stack != null && !stack.is(Items.AIR)) {
+                            ModConfig.get().toggleFavouriteItem(BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
+                            ModConfig.save();
+                        }
                     }
                 }
             }
