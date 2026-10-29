@@ -37,8 +37,9 @@ public class DropDelayHandler {
         }
         int newSlot = minecraft.player.getInventory().getSelectedSlot();
         if (newSlot != currentSlot) {
-            reset();
+            ((KeyMappingAccessor) minecraft.options.keyDrop).setTimesPressed(0); // eat all presses!
             currentSlot = newSlot;
+            reset();
             return;
         }
         if (ModKeyMappings.isDown(keyToggleDropDelay)) {
@@ -112,7 +113,6 @@ public class DropDelayHandler {
 
     private static void doDropProgress(Minecraft minecraft, ItemStack stack, DropAction dropAction) {
         if (ModKeyMappings.isDown(minecraft.options.keyDrop)) {
-            ((KeyMappingAccessor) minecraft.options.keyDrop).setTimesPressed(0); // eat all presses!
             if (dropDelayCounter < getCounterMax()) {
                 boolean isDropStackDown = ModKeyMappings.isDown(keyDropStack) && stack.getCount() > 1;
                 if (dropDelayCounter == 0)
