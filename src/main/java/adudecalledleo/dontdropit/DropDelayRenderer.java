@@ -2,10 +2,10 @@ package adudecalledleo.dontdropit;
 
 import adudecalledleo.dontdropit.config.FavouredChecker;
 import adudecalledleo.dontdropit.config.ModConfig;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
 public class DropDelayRenderer {
@@ -24,7 +24,7 @@ public class DropDelayRenderer {
     private static final int COLOR_FORCE = pack(0xFF, 0x00, 0x00, 0x30);
     private static final int COLOR_PROGRESS = pack(0x00, 0xFF, 0x00, 0x30);
 
-    public static void renderProgressOverlay(GuiGraphics graphics, ItemStack stack, int x, int y, int w, int h) {
+    public static void renderProgressOverlay(GuiGraphics graphics, ItemStack stack, float partialTick, int x, int y, int w, int h) {
         ItemStack currentStack = DropDelayHandler.getCurrentStack();
         if (currentStack.isEmpty() || currentStack != stack)
             return;
@@ -34,14 +34,18 @@ public class DropDelayRenderer {
                 || (ModKeyMappings.isDown(ModKeyMappings.keyForceDrop) && FavouredChecker.isStackFavoured(stack)))
             graphics.fill(x, y, x + w, y + h, COLOR_FORCE);
         long counter = DropDelayHandler.getCounter();
-        int progHeight = Mth.floor((counter / (double) DropDelayHandler.getCounterMax()) * h);
-        graphics.fill(x, y + h - progHeight, x + w, y + h, COLOR_PROGRESS);
+        float progHeight = ((counter + partialTick) / DropDelayHandler.getCounterMax()) * h;
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(x, y + h - progHeight);
+        graphics.pose().scale(w, progHeight);
+        graphics.fill(0, 0, 1, 1, COLOR_PROGRESS);
+        graphics.pose().popMatrix();
     }
 
-    public static void renderOverlay(GuiGraphics graphics, ItemStack stack, int x, int y) {
+    public static void renderOverlay(GuiGraphics graphics, ItemStack stack, DeltaTracker tickCounter, int x, int y) {
         if (stack.isEmpty())
             return;
         renderFavouriteIcon(graphics, stack, x - 1, y - 1);
-        renderProgressOverlay(graphics, stack, x, y, 16, 16);
+        renderProgressOverlay(graphics, stack, tickCounter.getGameTimeDeltaPartialTick(false), x, y, 16, 16);
     }
 }

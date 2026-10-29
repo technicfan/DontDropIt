@@ -94,6 +94,6 @@ public abstract class AbstractContainerScreenMixin_HooksAndMisc extends Screen i
     public void drawSlotProgressOverlay(GuiGraphics graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (IgnoredSlots.isSlotIgnored(slot))
             return;
-        DropDelayRenderer.renderOverlay(graphics, slot.getItem(), slot.x, slot.y);
+        DropDelayRenderer.renderOverlay(graphics, slot.getItem(), minecraft.getDeltaTracker(), slot.x, slot.y);
     }
 }
